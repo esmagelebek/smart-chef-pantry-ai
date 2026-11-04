@@ -4,13 +4,18 @@ from app.models.user import User
 from app.utils.security import hash_password, verify_password
 
 
+class DuplicateEmailError(ValueError):
+    """Kayıt sırasında kullanılan e-posta adresi zaten mevcut."""
+    pass
+
+
 def register_user(first_name, last_name, email, password):
     email = email.strip().lower()
 
     existing_user = User.query.filter_by(email=email).first()
 
     if existing_user:
-        raise ValueError("Bu e-posta adresi zaten kayıtlı.")
+        raise DuplicateEmailError("Bu e-posta adresi zaten kayıtlı.")
 
     user = User(
         first_name=first_name.strip(),

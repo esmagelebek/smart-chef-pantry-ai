@@ -4,12 +4,14 @@ from flask_jwt_extended import jwt_required
 from sqlalchemy.exc import IntegrityError
 
 from app.schemas.ingredient_schema import validate_ingredient_data
+
 from app.services.ingredient_service import (
     create_ingredient,
     get_all_ingredients,
     get_ingredient_by_id,
     update_ingredient,
-    delete_ingredient
+    delete_ingredient,
+    DuplicateIngredientError
 )
 
 
@@ -44,6 +46,12 @@ def create():
             "ingredient": ingredient_to_dict(ingredient)
         }), 201
 
+    except DuplicateIngredientError as error:
+        return jsonify({
+            "success": False,
+            "message": str(error)
+        }), 409
+
     except ValueError as error:
         return jsonify({
             "success": False,
@@ -53,7 +61,7 @@ def create():
     except IntegrityError:
         return jsonify({
             "success": False,
-            "message": "Bu malzeme zaten kayıtlı veya ilişkili bir veri kısıtlaması oluştu."
+            "message": "Veritabanı kısıtlaması nedeniyle malzeme eklenemedi."
         }), 409
 
     except Exception:
@@ -117,6 +125,12 @@ def update(ingredient_id):
             "message": "Malzeme başarıyla güncellendi.",
             "ingredient": ingredient_to_dict(ingredient)
         }), 200
+
+    except DuplicateIngredientError as error:
+        return jsonify({
+            "success": False,
+            "message": str(error)
+        }), 409
 
     except ValueError as error:
         return jsonify({

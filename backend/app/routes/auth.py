@@ -2,15 +2,21 @@
 from flask import Blueprint, jsonify, request
 from app.extensions import db
 from app.models.user import User
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    get_jwt_identity
+)
 
 from app.schemas.auth_schema import (
     validate_login_data,
     validate_register_data
 )
+
 from app.services.auth_service import (
     authenticate_user,
-    register_user
+    register_user,
+    DuplicateEmailError
 )
 
 
@@ -39,6 +45,12 @@ def register():
                 "email": user.email
             }
         }), 201
+
+    except DuplicateEmailError as error:
+        return jsonify({
+            "success": False,
+            "message": str(error)
+        }), 409
 
     except ValueError as error:
         return jsonify({
@@ -94,13 +106,12 @@ def login():
             "success": False,
             "message": "Giriş sırasında bir sunucu hatası oluştu."
         }), 500
-    
+
+
 @auth_bp.get("/me")
 @jwt_required()
 def get_current_user():
     user_id = get_jwt_identity()
-
-    
 
     user = db.session.get(User, int(user_id))
 
@@ -119,4 +130,3 @@ def get_current_user():
             "email": user.email
         }
     }), 200
-

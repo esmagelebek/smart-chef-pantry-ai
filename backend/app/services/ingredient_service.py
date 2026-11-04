@@ -5,6 +5,11 @@ from app.extensions import db
 from app.models.ingredient import Ingredient
 
 
+class DuplicateIngredientError(ValueError):
+    """Malzeme adı başka bir kayıtta zaten mevcut."""
+    pass
+
+
 def create_ingredient(data):
     normalized_name = data["name"].strip()
 
@@ -13,7 +18,7 @@ def create_ingredient(data):
     ).first()
 
     if existing_ingredient:
-        raise ValueError("Bu malzeme zaten kayıtlı.")
+        raise DuplicateIngredientError("Bu malzeme zaten kayıtlı.")
 
     ingredient = Ingredient(
         name=normalized_name,
@@ -50,7 +55,9 @@ def update_ingredient(ingredient, data):
         ).first()
 
         if existing_ingredient:
-            raise ValueError("Bu malzeme adı başka bir kayıtta kullanılıyor.")
+            raise DuplicateIngredientError(
+                "Bu malzeme adı başka bir kayıtta kullanılıyor."
+            )
 
         ingredient.name = normalized_name
 
