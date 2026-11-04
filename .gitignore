@@ -35,3 +35,22 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Python virtual environments
+ENV/
+env/
+
+# Flutter local configuration
+**/local.properties
+**/.flutter-plugins-dependencies
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Coverage and test reports
+.coverage
+htmlcov/
+# Local VS Code settings
+.vscode/
