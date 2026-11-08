@@ -1,9 +1,10 @@
 from flask import Flask, jsonify
-
+from app.routes.favorite import favorite_bp
 from app.config import Config
 from app.extensions import cors, db, jwt, migrate
 from app import models
-
+from app.routes.recipe import recipe_bp
+from app.routes.cart import cart_bp
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -30,5 +31,8 @@ def create_app(config_class=Config):
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(ingredient_bp)
+    app.register_blueprint(recipe_bp)
+    app.register_blueprint(favorite_bp)
+    app.register_blueprint(cart_bp)
 
     return app
